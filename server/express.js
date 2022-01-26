@@ -2,30 +2,13 @@ import express from 'express';
 import environment from './config/environment';
 import logger from 'morgan';
 
-export default class App {
-  constructor() {
-    this.app = express();
-    this.app.use(
-      logger('dev', { skip: (req, res) => environment.env === 'test' })
-    );
-    this.app.use(express.json());
-    this.app.use(express.urlencoded({ extended: true }));
-    this.app.get('/', (req, res) => {
-      res.send('hello world');
-    });
-    this.setRoutes();
-  }
+const app = express();
 
-  setRoutes() {}
+app.use(logger('dev', { skip: (req, res) => environment.env === 'test' }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.get('/', (req, res) => {
+  res.send('hello world');
+});
 
-  getApp() {
-    return this.app;
-  }
-
-  listen() {
-    const { port } = environment;
-    this.app.listen(port, () => {
-      console.log(`Listening on port ${port}`);
-    });
-  }
-}
+export default app;
