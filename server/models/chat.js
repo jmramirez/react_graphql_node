@@ -4,7 +4,7 @@ import { Model, DataTypes} from 'sequelize';
 export default (sequelize) => {
   class Chat extends Model {
     static associate(models) {
-      Chat.belongsToMany(models.User, { through: 'users_chats'})
+      Chat.belongsToMany(models.User, { through: 'users_chats', foreignKey: 'chatId'})
       Chat.hasMany(models.Message, { as: 'Messages', foreignKey: 'chatId'});
     }
   }

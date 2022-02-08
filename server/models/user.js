@@ -5,7 +5,7 @@ export default (sequelize) => {
   class User extends Model {
     static associate(models) {
       User.hasMany(models.Post, { as: 'Posts', foreignKey: 'userId'})
-      User.belongsToMany(models.Chat, { through: 'users_chats'})
+      User.belongsToMany(models.Chat, { through: 'users_chats', foreignKey: 'userId'})
     }
   }
   User.init({
