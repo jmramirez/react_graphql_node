@@ -1,73 +1,10 @@
 import "./App.css";
-import { useState } from "react";
-import avatar1 from "./assets/images/avatar1.png";
-import avatar2 from "./assets/images/avatar2.png";
+import {Feed} from "./Feed";
 
-const postsData = [
-  {
-    id: 2,
-    text: "Lorem ipsum",
-    user: {
-      username: "test user",
-      avatar: avatar1,
-    },
-  },
-  {
-    id: 1,
-    text: "Lorem ipsum",
-    user: {
-      avatar: avatar2,
-      username: "test user 2",
-    },
-  },
-];
 
 function App() {
-  const [posts, setPosts] = useState(postsData);
-  const [postContent, setPostContent] = useState("");
-
-  const handlePostContentChange = (e) => {
-    setPostContent(e.target.value);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newPost = {
-      id: posts.length + 1,
-      text: postContent,
-      user: {
-        avatar: avatar1,
-        username: "Fake user",
-      },
-    };
-    setPosts([newPost, ...posts]);
-    setPostContent("");
-  };
-
   return (
-    <div className="container">
-      <div className="postForm">
-        <form onSubmit={handleSubmit}>
-          <textarea
-            placeholder="Write your post!"
-            value={postContent}
-            onChange={handlePostContentChange}
-          />
-          <input type="submit" value="Submit" />
-        </form>
-      </div>
-      <div className="feed">
-        {posts.map((post, i) => (
-          <div key={post.id} className="post">
-            <div className="header">
-              <img src={post.user.avatar} />
-              <h2>{post.user.username}</h2>
-            </div>
-            <p className="content">{post.text}</p>
-          </div>
-        ))}
-      </div>
-    </div>
+    <Feed/>
   );
 }
 
