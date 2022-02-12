@@ -33,6 +33,15 @@ const typeDefinitions = `
         avatar: String!
     }
     
+    input ChatInput {
+        users: [Int]
+    }
+    
+    input MessageInput {
+        text: String!
+        chatId: Int!
+    }
+    
     type RootQuery {
         posts: [Post]
         chats: [Chat]
@@ -43,6 +52,12 @@ const typeDefinitions = `
         addPost (
             post: PostInput!
         ) : Post
+        addChat (
+            chat: ChatInput!
+        ) : Chat
+        addMessage (
+            message: MessageInput!
+        ) : Message
     }
     
     schema {
