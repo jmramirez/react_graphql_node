@@ -1,8 +1,6 @@
 import "./App.css";
 import { useState } from "react";
-import avatar1 from "./assets/images/avatar1.png";
-import avatar2 from "./assets/images/avatar2.png";
-import {gql, useQuery} from "@apollo/client";
+import {gql, useMutation, useQuery} from "@apollo/client";
 
 const GET_POSTS = gql`
 {
@@ -16,37 +14,39 @@ const GET_POSTS = gql`
   } 
 }`;
 
-
+const ADD_POST = gql`
+    mutation addPost($post : PostInput!){
+        addPost(post: $post){
+            id
+            text
+            user {
+                username
+                avatar
+            }
+        }
+    }
+`;
 
 export const Feed = () =>  {
   const { loading, error, data } = useQuery(GET_POSTS);
   const [postContent, setPostContent] = useState("");
+  const [addPost] = useMutation(ADD_POST)
 
   const handlePostContentChange = (e) => {
     setPostContent(e.target.value);
   };
 
-    if (loading) return "Loading...";
-    if (error) return `Error! ${error.message}`;
+  if (loading) return "Loading...";
+  if (error) return `Error! ${error.message}`;
 
-  /*const handleSubmit = (e) => {
-    e.preventDefault();
-    const newPost = {
-      id: posts.length + 1,
-      text: postContent,
-      user: {
-        avatar: avatar1,
-        username: "Fake user",
-      },
-    };
-    setPosts([newPost, ...posts]);
-    setPostContent("");
-  };*/
 
   return (
     <div className="container">
       <div className="postForm">
-        <form >
+        <form onSubmit={(e) => {
+            e.preventDefault();
+            addPost({ variables: {post:{text: postContent}}}).then(() => setPostContent(""))
+        }}>
           <textarea
             placeholder="Write your post!"
             value={postContent}
@@ -59,7 +59,7 @@ export const Feed = () =>  {
         {data.posts.map((post, i) => (
           <div key={post.id} className="post">
             <div className="header">
-              <img src={post.user.avatar} />
+              <img src={post.user.avatar} alt="User Avatar" />
               <h2>{post.user.username}</h2>
             </div>
             <p className="content">{post.text}</p>
