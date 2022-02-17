@@ -30,7 +30,30 @@ const ADD_POST = gql`
 export const Feed = () =>  {
   const { loading, error, data } = useQuery(GET_POSTS);
   const [postContent, setPostContent] = useState("");
-  const [addPost] = useMutation(ADD_POST)
+  const [addPost] = useMutation(ADD_POST, {
+      update(cache, { data: { addPost }}) {
+          cache.modify({
+              fields: {
+                  posts(existingPosts = []) {
+                      const newPostRef = cache.writeFragment({
+                          data: addPost,
+                          fragment: gql`
+                            fragment NewPost on Post {
+                                id
+                                text
+                                user {
+                                    username
+                                    avatar
+                                }
+                            }
+                          `
+                      })
+                      return [newPostRef,...existingPosts]
+                  }
+              }
+          })
+      }
+  })
 
   const handlePostContentChange = (e) => {
     setPostContent(e.target.value);
@@ -45,7 +68,20 @@ export const Feed = () =>  {
       <div className="postForm">
         <form onSubmit={(e) => {
             e.preventDefault();
-            addPost({ variables: {post:{text: postContent}}}).then(() => setPostContent(""))
+            addPost({ variables: {post:{text: postContent}},
+                optimisticResponse: {
+                    addPost: {
+                        __typename: "Post",
+                        text: postContent,
+                        id: -1,
+                        user: {
+                            __typename: "User",
+                            username: "Loading...",
+                            avatar: "/public/loading.gif"
+                        }
+                    }
+                }
+            }).then(() => setPostContent(""))
         }}>
           <textarea
             placeholder="Write your post!"
@@ -57,7 +93,7 @@ export const Feed = () =>  {
       </div>
       <div className="feed">
         {data.posts.map((post, i) => (
-          <div key={post.id} className="post">
+          <div key={post.id} className={'post ' + (post.id < 0 ? 'optimistic' : '')}>
             <div className="header">
               <img src={post.user.avatar} alt="User Avatar" />
               <h2>{post.user.username}</h2>
